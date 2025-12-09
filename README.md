@@ -30,7 +30,12 @@ And the `Tobii Ghost v1.14.1` (https://gaming.tobii.com/getstarted/?bundle=tobii
 1. **Get the Unity project**    
 Use this command :
 ```bash
-git clone --recurse-submodules <git url>
+git clone --recurse-submodules https://github.com/naval-group/LOTUSim-Unity-modules
+```
+
+And after cloning:
+```sh
+git submodule update --remote --merge
 ```
 
 2. **Add & open the project on Unity Hub.**
