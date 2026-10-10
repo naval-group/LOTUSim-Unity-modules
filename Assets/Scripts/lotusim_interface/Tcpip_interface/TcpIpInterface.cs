@@ -281,6 +281,8 @@ namespace Lotusim
                 switch (cmd.cmd)
                 {
                     case "create":
+                        // cmd.position is in the Gazebo frame; vessels to create
+                        // are handed over in Unity's frame, as in the ROS interface.
                         m_vesselToCreate[cmd.name] = new Tuple<string, Pose>(
                             cmd.type,
                             CoordinateSystemUtils.GzPoseToUnityPose(new Pose(cmd.position, Quaternion.identity))
@@ -321,10 +323,10 @@ namespace Lotusim
                 {
                     var vessel = m_vessel_info_msg[i];
 
-                    // Update vessel pose
-                    m_vesselPoses[vessel.name] = CoordinateSystemUtils.GzPoseToUnityPose(
-                        new Pose(vessel.position, vessel.rotation)
-                    );
+                    // Gazebo frame, as in the ROS interface: LotusimConnector
+                    // converts poses to Unity's frame (converting here as well
+                    // swapped y and z back).
+                    m_vesselPoses[vessel.name] = new Pose(vessel.position, vessel.rotation);
 
                     // Update thrusters
                     foreach (ThrusterInfo thruster in vessel.thrusters)
