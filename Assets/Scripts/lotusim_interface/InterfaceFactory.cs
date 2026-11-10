@@ -45,7 +45,7 @@ namespace Lotusim
             if (s_interfaceMap.TryGetValue(type.ToUpperInvariant(), out var constructor))
             {
                 var iface = constructor();
-                iface.Start(rosNamespace); // Important for ROS2 interface initialization
+                iface.Start(rosNamespace); // The only Start: callers must not start it again
                 return iface;
             }
 

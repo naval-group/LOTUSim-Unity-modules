@@ -52,11 +52,13 @@ namespace Lotusim
         public void OnNamespaceChanged()
         {
             Debug.Log("Handling namespace change: " + m_namespace);
+            // A destroyed interface cannot be started again (the TCP/IP one
+            // keeps its shutdown flag): create a new one.
             if (m_interface != null)
             {
                 m_interface.Destroy();
             }
-            m_interface.Start(m_namespace);
+            Start();
         }
 
         public void OnInterfaceTypeChanged()
@@ -71,13 +73,19 @@ namespace Lotusim
 
         private void Start()
         {
-            m_interface = LotusimInterfaceFactory.CreateInterface(selectedInterfaceType);
+            // The factory starts the interface: starting it here as well opened
+            // the TCP/UDP sockets twice on the same port, and subscribed the ROS
+            // interface to the root namespace before m_namespace.
+            m_interface = LotusimInterfaceFactory.CreateInterface(selectedInterfaceType, m_namespace);
             UpdateVesselsList();
-            m_interface.Start(m_namespace);
         }
 
         private void Update()
         {
+            if (m_interface == null)
+            {
+                return;
+            }
             m_interface.Update();
             UpdateVesselPoses();
             ProcessCommands();

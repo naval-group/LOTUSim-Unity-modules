@@ -148,9 +148,8 @@ namespace Lotusim
                         (float)poseObject["z"]
                     );
 
-                    // Convert from right-handed to Unity left-handed coordinate system
-                    position = CoordinateSystemConversion(position);
-
+                    // Kept in the Gazebo frame: TCPIPInterface converts it once,
+                    // with the rotation (converting here too swapped y and z back).
                     return new UnityCmd(cmd, name, position, type);
                 }
 
@@ -163,14 +162,6 @@ namespace Lotusim
             public override void WriteJson(JsonWriter writer, UnityCmd value, JsonSerializer serializer)
             {
                 throw new NotImplementedException();
-            }
-
-            /// <summary>
-            /// Converts a right-handed coordinate system vector to Unity's left-handed system.
-            /// </summary>
-            private Vector3 CoordinateSystemConversion(Vector3 msg)
-            {
-                return new Vector3(msg.x, msg.z, msg.y);
             }
         }
     }
