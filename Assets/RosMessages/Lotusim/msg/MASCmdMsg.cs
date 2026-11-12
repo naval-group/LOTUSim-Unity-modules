@@ -16,21 +16,29 @@ namespace RosMessageTypes.Lotusim
         //  Built in commands
         public const sbyte CREATE_CMD = 0; //  only fill in sdf_string
         public const sbyte DELETE_CMD = 1; //  only fill in entity or vessel_name
-        public const sbyte MOVE_CMD = 2; //  only fill in (entity or vessel_name) and vessel_position
+        public const sbyte MOVE_CMD = 2; //  only fill in (entity or vessel_name), geo_point and heading
         public byte cmd_type;
         //  sdf definition in string if creation type
         public string sdf_string;
         //  If model has been created with folder in `assets/models` directory, sdf will be retrieved. 
         //  Lotusim param will be retrieved from sdf_string
         public string model_name;
-        //  Name of vessel in gazebo
+        //  Optional SDF file name inside the model folder.
+        //  If not specified, the default file `model.sdf` will be used.
+        //  Only applicable when the model exists in `assets/models`.
+        public string sdf_file;
+        //  Name of vessel in gazebo. Names must not start with number of special character
         public string vessel_name;
         //  ID of vessel in gazebo. 
         //  During creation, the entity entered does not matter and will be overwritten
         public ushort entity;
-        //  vessel position if create or modify cmd
-        public Geometry.PoseMsg vessel_position;
+        //  Where the vessel is placed, for a create or a move command, always given
+        //  (0 is a value: the equator, the Greenwich meridian, the sea surface):
+        //  WGS84 latitude and longitude in degrees, altitude in metres from sea level,
+        //  positive up, negative when submerged (a submarine at 30 m is at -30).
         public Geographic.GeoPointMsg geo_point;
+        //  Heading, where the bow points: degrees from true North, clockwise
+        //  (0 = North, 90 = East), for a create or a move command, always given.
         public float heading;
 
         public MASCmdMsg()
@@ -38,21 +46,21 @@ namespace RosMessageTypes.Lotusim
             this.cmd_type = 0;
             this.sdf_string = "";
             this.model_name = "";
+            this.sdf_file = "";
             this.vessel_name = "";
             this.entity = 0;
-            this.vessel_position = new Geometry.PoseMsg();
             this.geo_point = new Geographic.GeoPointMsg();
             this.heading = 0.0f;
         }
 
-        public MASCmdMsg(byte cmd_type, string sdf_string, string model_name, string vessel_name, ushort entity, Geometry.PoseMsg vessel_position, Geographic.GeoPointMsg geo_point, float heading)
+        public MASCmdMsg(byte cmd_type, string sdf_string, string model_name, string sdf_file, string vessel_name, ushort entity, Geographic.GeoPointMsg geo_point, float heading)
         {
             this.cmd_type = cmd_type;
             this.sdf_string = sdf_string;
             this.model_name = model_name;
+            this.sdf_file = sdf_file;
             this.vessel_name = vessel_name;
             this.entity = entity;
-            this.vessel_position = vessel_position;
             this.geo_point = geo_point;
             this.heading = heading;
         }
@@ -64,9 +72,9 @@ namespace RosMessageTypes.Lotusim
             deserializer.Read(out this.cmd_type);
             deserializer.Read(out this.sdf_string);
             deserializer.Read(out this.model_name);
+            deserializer.Read(out this.sdf_file);
             deserializer.Read(out this.vessel_name);
             deserializer.Read(out this.entity);
-            this.vessel_position = Geometry.PoseMsg.Deserialize(deserializer);
             this.geo_point = Geographic.GeoPointMsg.Deserialize(deserializer);
             deserializer.Read(out this.heading);
         }
@@ -76,9 +84,9 @@ namespace RosMessageTypes.Lotusim
             serializer.Write(this.cmd_type);
             serializer.Write(this.sdf_string);
             serializer.Write(this.model_name);
+            serializer.Write(this.sdf_file);
             serializer.Write(this.vessel_name);
             serializer.Write(this.entity);
-            serializer.Write(this.vessel_position);
             serializer.Write(this.geo_point);
             serializer.Write(this.heading);
         }
@@ -89,9 +97,9 @@ namespace RosMessageTypes.Lotusim
             "\ncmd_type: " + cmd_type.ToString() +
             "\nsdf_string: " + sdf_string.ToString() +
             "\nmodel_name: " + model_name.ToString() +
+            "\nsdf_file: " + sdf_file.ToString() +
             "\nvessel_name: " + vessel_name.ToString() +
             "\nentity: " + entity.ToString() +
-            "\nvessel_position: " + vessel_position.ToString() +
             "\ngeo_point: " + geo_point.ToString() +
             "\nheading: " + heading.ToString();
         }

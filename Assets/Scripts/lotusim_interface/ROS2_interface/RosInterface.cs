@@ -78,9 +78,9 @@ namespace Lotusim
 
         private ROSConnection m_rosConnection;
 
-        private VesselPositionArrayMsg m_vessel_array_msg;
+        private VesselPoseArrayMsg m_vessel_array_msg;
         private Mutex m_vessel_array_mutex = new Mutex();
-        private VesselPositionArrayMsg m_prev_vessel_array_msg = null;
+        private VesselPoseArrayMsg m_prev_vessel_array_msg = null;
 
         private readonly List<RendererCmdMsg> m_render_commands = new List<RendererCmdMsg>();
         private Mutex m_render_commands_mutex = new Mutex();
@@ -107,7 +107,7 @@ namespace Lotusim
             m_rosConnection = ROSConnection.GetOrCreateInstance();
 
             // Subscribe to vessel poses
-            m_rosConnection.Subscribe<VesselPositionArrayMsg>(
+            m_rosConnection.Subscribe<VesselPoseArrayMsg>(
                 $"{_namespace}/renderer_poses",
                 OnVesselPositionsReceived
             );
@@ -146,7 +146,7 @@ namespace Lotusim
 
         #region Message Handlers
 
-        private void OnVesselPositionsReceived(VesselPositionArrayMsg poses)
+        private void OnVesselPositionsReceived(VesselPoseArrayMsg poses)
         {
             m_vessel_array_mutex.WaitOne();
             m_vessel_array_msg = poses;
