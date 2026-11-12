@@ -14,22 +14,38 @@ namespace RosMessageTypes.Lotusim
         public override string RosMessageName => k_RosMessageName;
 
         public string vessel_name;
-        public Geometry.PoseMsg pose;
-        //  Orientation uses front-left-up
+        public string model_name;
+        //  WGS84 latitude and longitude in degrees, altitude in metres from sea level,
+        //  positive up, negative when submerged.
         public Geographic.GeoPointMsg geo_point;
+        //  Heading, where the bow points: degrees from true North, clockwise, in
+        //  [0, 360).
+        public float heading;
+        //  Course over ground, the direction of motion: degrees from true North,
+        //  clockwise, in [0, 360); 360 when the vessel is not moving (below 0.05 m/s),
+        //  as AIS does.
+        public float course;
+        //  Horizontal speed over ground, m/s.
+        public float speed_over_ground;
 
         public VesselPositionMsg()
         {
             this.vessel_name = "";
-            this.pose = new Geometry.PoseMsg();
+            this.model_name = "";
             this.geo_point = new Geographic.GeoPointMsg();
+            this.heading = 0.0f;
+            this.course = 0.0f;
+            this.speed_over_ground = 0.0f;
         }
 
-        public VesselPositionMsg(string vessel_name, Geometry.PoseMsg pose, Geographic.GeoPointMsg geo_point)
+        public VesselPositionMsg(string vessel_name, string model_name, Geographic.GeoPointMsg geo_point, float heading, float course, float speed_over_ground)
         {
             this.vessel_name = vessel_name;
-            this.pose = pose;
+            this.model_name = model_name;
             this.geo_point = geo_point;
+            this.heading = heading;
+            this.course = course;
+            this.speed_over_ground = speed_over_ground;
         }
 
         public static VesselPositionMsg Deserialize(MessageDeserializer deserializer) => new VesselPositionMsg(deserializer);
@@ -37,23 +53,32 @@ namespace RosMessageTypes.Lotusim
         private VesselPositionMsg(MessageDeserializer deserializer)
         {
             deserializer.Read(out this.vessel_name);
-            this.pose = Geometry.PoseMsg.Deserialize(deserializer);
+            deserializer.Read(out this.model_name);
             this.geo_point = Geographic.GeoPointMsg.Deserialize(deserializer);
+            deserializer.Read(out this.heading);
+            deserializer.Read(out this.course);
+            deserializer.Read(out this.speed_over_ground);
         }
 
         public override void SerializeTo(MessageSerializer serializer)
         {
             serializer.Write(this.vessel_name);
-            serializer.Write(this.pose);
+            serializer.Write(this.model_name);
             serializer.Write(this.geo_point);
+            serializer.Write(this.heading);
+            serializer.Write(this.course);
+            serializer.Write(this.speed_over_ground);
         }
 
         public override string ToString()
         {
             return "VesselPositionMsg: " +
             "\nvessel_name: " + vessel_name.ToString() +
-            "\npose: " + pose.ToString() +
-            "\ngeo_point: " + geo_point.ToString();
+            "\nmodel_name: " + model_name.ToString() +
+            "\ngeo_point: " + geo_point.ToString() +
+            "\nheading: " + heading.ToString() +
+            "\ncourse: " + course.ToString() +
+            "\nspeed_over_ground: " + speed_over_ground.ToString();
         }
 
 #if UNITY_EDITOR
